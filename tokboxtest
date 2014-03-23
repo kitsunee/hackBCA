@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>um</title>
+    <meta charset="utf-8">
+    <script src='https://swww.tokbox.com/webrtc/v2.0/js/TB.min.js'></script>
+    
+  </head>
+  <body>
+    
+    <div id="myPublisherDiv"></div>
+        <script type="text/javascript">
+        
+
+  // initialize environment w/ parameters
+  // values are static
+  var apiKey    = "44704502";
+  var sessionId = "2_MX40NDcwNDUwMn5-U2F0IE1hciAyMiAyMDoxNzoyNyBQRFQgMjAxNH4wLjI1NzM4Mjg3fg";
+    var token     = "T1==cGFydG5lcl9pZD00NDcwNDUwMiZzZGtfdmVyc2lvbj10YnJ1YnktdGJyYi12MC45MS4yMDExLTAyLTE3JnNpZz00MDY1MWJkZjFlNWI0MGMzMmI2ODkxOWU0ZWU1ZGRhNGM0YTJjZmZkOnJvbGU9cHVibGlzaGVyJnNlc3Npb25faWQ9Ml9NWDQwTkRjd05EVXdNbjUtVTJGMElFMWhjaUF5TWlBeU1Eb3hOem95TnlCUVJGUWdNakF4Tkg0d0xqSTFOek00TWpnM2ZnJmNyZWF0ZV90aW1lPTEzOTU1NDQ2NzYmbm9uY2U9MC44OTI5NDU1MzcyNTU0NTQ2JmV4cGlyZV90aW1lPTEzOTU2MzEwMjgmY29ubmVjdGlvbl9kYXRhPQ==";
+ 
+  // executed when connection to session is successful
+  // stream (w/ audio and video) published and subscribes to all other streams being published in session connected to
+  function sessionConnectedHandler (event) {
+     session.publish( publisher );
+     subscribeToStreams(event.streams);
+  }
+  
+  // automates process of subcsribing to every stream excluding selef
+  function subscribeToStreams(streams) {
+    for (var i = 0; i < streams.length; i++) {
+        var stream = streams[i];
+        if (stream.connection.connectionId 
+               != session.connection.connectionId) {
+            session.subscribe(stream);
+        }
+    }
+  }
+  
+  // function to subscribe to new streams created while session is active
+  function streamCreatedHandler(event) {
+    subscribeToStreams(event.streams);
+  }
+  
+  // publisher resized
+  function resizePublisher() {
+    var pubElement = document.getElementById(publisher.id);
+    pubElement.style.width = "1000px";
+    pubElement.style.height = "750px";
+  }
+ 
+  // register all functions with proper event
+  // session initialized and connected to
+  var publisher = TB.initPublisher(apiKey, "myPublisher");
+  
+  var subscriber = session.subscribe(stream, "mySubscriberElement")
+  
+  var session   = TB.initSession(sessionId);
+ 
+  session.connect(apiKey, token);
+  session.addEventListener("sessionConnected", 
+                           sessionConnectedHandler);
+ 
+  session.addEventListener("streamCreated", 
+                           streamCreatedHandler);
+       
+  // capture publisher img                    
+  var imgData = publisher.getImgData();
+  var img = document.createElement("img");
+  img.setAttribute("src", "data:image/png;base64," + imgData);
+ 
+  // Replace with the parent DIV for the img
+  document.getElementById("containerId").appendChild(img);
+  
+  // capture subscriber img
+  var imgData = subscriber.getImgData();
+  var img = document.createElement("img");
+  img.setAttribute("src", "data:image/png;base64," + imgData);
+ 
+  // Replace with the parent DIV for the img
+  document.getElementById("containerId").appendChild(img);
+
+
+        </script>
+    
+    <div id="container">
+        <div id="myPublisher"></div>
+        <a href="javascript:resizePublisher()">resize</a>
+    </div>
+</body>
+</html>
